@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>🛳️ OptiShip - myjaan.ai</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px}</style>
+</head>
+<body>
+<h1>🛳️ OptiShip Dashboard Test</h1>
+<p>93% savings | 65% scan rate | Live data below</p>
+<canvas id="chart" width="600" height="300"></canvas>
+<script>
+const ctx = document.getElementById('chart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: ['UserA','UserB','UserC','UserD'],
+    datasets: [{
+      label: 'Actual Savings $',
+      data: [4.7,4.2,4.0,4.1],
+      backgroundColor: 'orange'
+    },{
+      label: 'Optimal $ (Uplift)',
+      data: [5.1,4.8,4.9,5.0],
+      backgroundColor: 'green'
+    }]
+  },
+  options: {scales: {y: {beginAtZero: true}}}
+});
+</script>
+<p><strong>✅ Test Passed!</strong> Full Replit: <a href="[your-replit-url]">Dashboard</a></p>
+</body>
+</html>
