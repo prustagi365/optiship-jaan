@@ -3,37 +3,78 @@
 <head>
 <title>🛳️ OptiShip - myjaan.ai</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px}</style>
+<style>
+  body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+  #status { margin-top: 10px; font-size: 0.9em; color: #555; }
+</style>
 </head>
 <body>
-<h1>🛳️ OptiShip Dashboard Test</h1>
-<p>93% savings | 65% scan rate | Live data below</p>
+<h1>🛳️ OptiShip Dashboard</h1>
+<p>Shipping cost savings — actual vs optimal, grouped by user.</p>
 <canvas id="chart" width="600" height="300"></canvas>
+<div id="status">Loading data...</div>
+
 <script>
-const ctx = document.getElementById('chart').getContext('2d');
-new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: ['UserA','UserB','UserC','UserD'],
-    datasets: [{
-      label: 'Actual Savings $',
-      data: [4.7,4.2,4.0,4.1],
-      backgroundColor: 'orange'
-    },{
-      label: 'Optimal $ (Uplift)',
-      data: [5.1,4.8,4.9,5.0],
-      backgroundColor: 'green'
-    }]
-  },
-  
-  options: {scales: {y: {beginAtZero: true}}}
-});
-  <div style="margin-top:20px; padding:10px; border:1px solid #ccc; border-radius:4px;">
-  <p><strong>Live summary:</strong></p>
-  <p>93% avg savings vs naïve route</p>
-  <p>74 shipments analyzed</p>
-</div>
+async function renderChart() {
+  const statusEl = document.getElementById('status');
+  let data;
+  try {
+    const res = await fetch('savings.json');
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    data = await res.json();
+  } catch (err) {
+    statusEl.textContent = `⚠️ Could not load savings.json: ${err.message}. Run preprocess_savings.py first.`;
+    return;
+  }
+
+  const labels       = data.map(d => d.user_id);
+  const actualSums   = data.map(d => d.actual_sum);
+  const optimalSums  = data.map(d => d.optimal_sum);
+
+  const ctx = document.getElementById('chart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Actual Cost ($)',
+          data: actualSums,
+          backgroundColor: 'orange'
+        },
+        {
+          label: 'Optimal Cost ($)',
+          data: optimalSums,
+          backgroundColor: 'steelblue'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        title: {
+          display: true,
+          text: 'OptiShip: Actual vs Optimal Shipping Cost by User'
+        }
+      },
+      scales: { y: { beginAtZero: true, title: { display: true, text: 'Cost ($)' } } }
+    }
+  });
+
+  const totalActual  = actualSums.reduce((a, b) => a + b, 0).toFixed(2);
+  const totalOptimal = optimalSums.reduce((a, b) => a + b, 0).toFixed(2);
+  const pctSaved     = (((totalActual - totalOptimal) / totalActual) * 100).toFixed(1);
+  statusEl.innerHTML = `<strong>Total actual:</strong> $${totalActual} &nbsp;|&nbsp; <strong>Total optimal:</strong> $${totalOptimal} &nbsp;|&nbsp; <strong>Savings:</strong> ${pctSaved}%`;
+}
+
+renderChart();
 </script>
-<p><strong>✅ Test Passed!</strong> Full Replit: <a href="[your-replit-url]">Dashboard</a></p>
+
+<div style="margin-top:20px; padding:10px; border:1px solid #ccc; border-radius:4px;">
+  <p><strong>How it works:</strong></p>
+  <p>1. Run <code>preprocess_savings.py</code> to generate <code>savings.json</code> from <code>optiship_logs.csv</code>.</p>
+  <p>2. Serve this folder (e.g. <code>python -m http.server</code>) and open <code>index.html</code>.</p>
+</div>
 </body>
-</html>--
+</html>
