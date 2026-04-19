@@ -4,13 +4,16 @@
 *~
 *.tmp
 
+# Virtual env
+venv/
+env/
+
 # Local config
 .env
 *.local
 
-# Binaries / build
+# Build / binaries
 bin/
-*/bin/
 build/
 dist/
 node_modules/
