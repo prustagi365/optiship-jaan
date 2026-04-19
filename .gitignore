@@ -1,0 +1,22 @@
+# OS / editor
+.DS_Store
+*.swp
+*~
+*.tmp
+
+# Local config
+.env
+*.local
+
+# Binaries / build
+bin/
+*/bin/
+build/
+dist/
+node_modules/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Logs
+*.log
